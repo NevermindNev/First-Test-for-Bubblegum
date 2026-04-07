@@ -18,6 +18,7 @@ This is a minimal Java web API built with:
 | GET | `/hello/:name` | Personalized greeting |
 | POST | `/echo` | Echo back posted data |
 | GET | `/api/info` | API information |
+| GET | `/api/metrics` | System metrics (coming soon) |
 
 ## Quick Start
 
