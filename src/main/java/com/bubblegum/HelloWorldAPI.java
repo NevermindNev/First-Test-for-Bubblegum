@@ -55,12 +55,58 @@ public class HelloWorldAPI {
         
         // POST endpoint for echo
         post("/echo", (req, res) -> {
-            Map<String, Object> response = new HashMap<>();
-            response.put("received", req.body());
-            response.put("echoed", true);
-            response.put("timestamp", System.currentTimeMillis());
+            try {
+                String body = req.body();
+                if (body == null || body.trim().isEmpty()) {
+                    Map<String, Object> error = new HashMap<>();
+                    error.put("error", "Request body cannot be empty");
+                    error.put("status", 400);
+                    res.status(400);
+                    res.type("application/json");
+                    return gson.toJson(error);
+                }
+                
+                Map<String, Object> response = new HashMap<>();
+                response.put("received", body);
+                response.put("echoed", true);
+                response.put("timestamp", System.currentTimeMillis());
+                response.put("length", body.length());
+                res.type("application/json");
+                return gson.toJson(response);
+            } catch (Exception e) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("error", "Failed to process request: " + e.getMessage());
+                error.put("status", 500);
+                res.status(500);
+                res.type("application/json");
+                return gson.toJson(error);
+            }
+        });
+        
+        // 404 handler for undefined routes
+        notFound((req, res) -> {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Endpoint not found: " + req.pathInfo());
+            error.put("status", 404);
+            error.put("available_endpoints", new String[] {
+                "GET /", "GET /health", "GET /hello/:name", 
+                "POST /echo", "GET /api/info"
+            });
+            res.status(404);
             res.type("application/json");
-            return gson.toJson(response);
+            return gson.toJson(error);
+        });
+        
+        // Exception handler
+        exception(Exception.class, (e, req, res) -> {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Internal server error");
+            error.put("message", e.getMessage());
+            error.put("status", 500);
+            error.put("path", req.pathInfo());
+            res.status(500);
+            res.type("application/json");
+            return gson.toJson(error);
         });
         
         // API info endpoint
