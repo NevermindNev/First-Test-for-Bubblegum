@@ -74,12 +74,25 @@ public class HelloWorldAPI {
                 "GET /health", 
                 "GET /hello/:name",
                 "POST /echo",
-                "GET /api/info"
+                "GET /api/info",
+                "GET /api/metrics"
             });
             info.put("creator", "LobsterBubblegum 🦞");
             info.put("repository", "https://github.com/NevermindNev/First-Test-for-Bubblegum");
             res.type("application/json");
             return gson.toJson(info);
+        });
+        
+        // Metrics endpoint (added in feature branch)
+        get("/api/metrics", (req, res) -> {
+            Map<String, Object> metrics = new HashMap<>();
+            metrics.put("timestamp", System.currentTimeMillis());
+            metrics.put("status", "operational");
+            metrics.put("uptime", "since startup");
+            metrics.put("requests_served", "tracking not yet implemented");
+            metrics.put("feature", "added via feature/add-metrics-endpoint branch");
+            res.type("application/json");
+            return gson.toJson(metrics);
         });
         
         System.out.println("API started successfully!");
